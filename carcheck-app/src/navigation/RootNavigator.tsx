@@ -12,6 +12,7 @@ import { colors } from '../constants';
 // Import screens
 import { HomeScreen } from '../screens/HomeScreen';
 import { NewRentalScreen } from '../screens/NewRentalScreen';
+import { ChecklistScreen } from '../screens/ChecklistScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -44,8 +45,14 @@ export const RootNavigator: React.FC = () => {
             title: 'New Rental',
           }}
         />
+        <Stack.Screen
+          name="Checklist"
+          component={ChecklistScreen}
+          options={{
+            title: 'Photo Checklist',
+          }}
+        />
         {/* TODO: Add more screens as we build them:
-            - Checklist
             - Camera
             - RentalDetail
             - Export
