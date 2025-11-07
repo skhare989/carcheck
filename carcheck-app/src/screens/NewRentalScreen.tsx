@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-paper-dropdown';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { NewRentalScreenProps } from '../types/navigation';
-import { colors, spacing, dimensions, RENTAL_COMPANIES, isOtherCompany } from '../constants';
+import { RENTAL_COMPANIES, isOtherCompany } from '../constants';
 import { Rental } from '../types/rental';
 import { saveRental } from '../utils/storage';
 import { CalendarDate } from 'react-native-paper-dates/lib/typescript/Date/Calendar';
+import { newRentalScreenStyles as styles } from './NewRentalScreen.styles';
 
 // Transform RENTAL_COMPANIES to dropdown options format
 const COMPANY_OPTIONS = RENTAL_COMPANIES.map((company) => ({
@@ -313,58 +314,3 @@ export const NewRentalScreen: React.FC<NewRentalScreenProps> = ({ navigation }) 
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.md,
-  },
-  fieldContainer: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    marginBottom: spacing.xs,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  input: {
-    backgroundColor: colors.surface,
-  },
-  dateButton: {
-    backgroundColor: colors.surface,
-    borderWidth: dimensions.borderWidth.thin,
-    borderColor: colors.gray300,
-    borderRadius: dimensions.borderRadius.sm,
-    padding: spacing.md,
-    minHeight: dimensions.minHeight.input,
-    justifyContent: 'center',
-  },
-  dateText: {
-    fontSize: 16,
-    color: colors.textPrimary,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: 12,
-    marginTop: spacing.xs,
-  },
-  buttonContainer: {
-    padding: spacing.md,
-    gap: spacing.sm,
-    backgroundColor: colors.surface,
-    borderTopWidth: dimensions.borderWidth.thin,
-    borderTopColor: colors.gray200,
-  },
-  primaryButton: {
-    paddingVertical: spacing.xs,
-  },
-  secondaryButton: {
-    paddingVertical: spacing.xs,
-  },
-});

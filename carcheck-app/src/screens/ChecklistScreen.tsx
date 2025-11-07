@@ -3,15 +3,16 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, ScrollView, Alert } from 'react-native';
 import { Text, Button, Appbar } from 'react-native-paper';
 import { ChecklistScreenProps } from '../types/navigation';
-import { colors, spacing, CHECKLIST_SECTIONS, getTotalSections } from '../constants';
+import { CHECKLIST_SECTIONS, getTotalSections } from '../constants';
 import { Rental } from '../types/rental';
 import { getRentalById, updateRental } from '../utils/storage';
 import { ProgressHeader } from '../components/checklist/ProgressHeader';
 import { SectionCard } from '../components/checklist/SectionCard';
 import { useFocusEffect } from '@react-navigation/native';
+import { checklistScreenStyles as styles } from './ChecklistScreen.styles';
 
 export const ChecklistScreen: React.FC<ChecklistScreenProps> = ({ navigation, route }) => {
   const { rentalId } = route.params;
@@ -249,70 +250,3 @@ export const ChecklistScreen: React.FC<ChecklistScreenProps> = ({ navigation, ro
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    backgroundColor: colors.primary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rentalInfo: {
-    backgroundColor: colors.surface,
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray200,
-  },
-  rentalCompany: {
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  rentalDetails: {
-    color: colors.textSecondary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.md,
-  },
-  completionMessage: {
-    backgroundColor: colors.successLight,
-    padding: spacing.lg,
-    borderRadius: 8,
-    marginTop: spacing.md,
-    alignItems: 'center',
-  },
-  completionText: {
-    color: colors.success,
-    fontWeight: '700',
-    marginBottom: spacing.xs,
-  },
-  completionSubtext: {
-    color: colors.success,
-  },
-  bottomSpacing: {
-    height: spacing.xl,
-  },
-  buttonContainer: {
-    padding: spacing.md,
-    gap: spacing.sm,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.gray200,
-    flexDirection: 'row',
-  },
-  primaryButton: {
-    flex: 1,
-  },
-  secondaryButton: {
-    flex: 1,
-  },
-});
