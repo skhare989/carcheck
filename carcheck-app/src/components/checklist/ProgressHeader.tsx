@@ -5,7 +5,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, ProgressBar } from 'react-native-paper';
-import { colors, spacing } from '../../constants';
+import { colors, spacing, fontWeight, dimensions } from '../../constants';
 
 interface ProgressHeaderProps {
   completedSections: number;
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   title: {
-    fontWeight: '700',
+    fontWeight: fontWeight.bold,
     color: colors.textPrimary,
   },
   subtitle: {
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 8,
-    borderRadius: 4,
+    borderRadius: dimensions.borderRadius.sm,
     backgroundColor: colors.gray200,
   },
 });

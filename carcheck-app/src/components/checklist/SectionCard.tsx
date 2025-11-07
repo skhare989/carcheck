@@ -3,8 +3,8 @@
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Card, Text, Button, Chip } from 'react-native-paper';
+import { View, StyleSheet, Image } from 'react-native';
+import { Card, Text, Button, Chip, TouchableRipple } from 'react-native-paper';
 import { ChecklistSection } from '../../constants';
 import { colors, spacing, dimensions } from '../../constants';
 import { Photo } from '../../types/rental';
@@ -43,10 +43,10 @@ export const SectionCard: React.FC<SectionCardProps> = ({
       style={[styles.card, isComplete && styles.cardComplete]}
       mode="outlined"
     >
-      <TouchableOpacity
+      <TouchableRipple
         onPress={handleCardPress}
-        activeOpacity={isComplete ? 0.7 : 1}
         disabled={!isComplete}
+        rippleColor="rgba(0, 0, 0, .08)"
       >
         <Card.Content style={styles.cardContent}>
           {/* Header Row */}
@@ -99,17 +99,19 @@ export const SectionCard: React.FC<SectionCardProps> = ({
           {isExpanded && photos.length > 0 && (
             <View style={styles.thumbnailContainer}>
               {photos.map((photo) => (
-                <TouchableOpacity
+                <TouchableRipple
                   key={photo.id}
                   style={styles.thumbnailWrapper}
                   onPress={() => onViewPhotos?.(section.id)}
+                  rippleColor="rgba(0, 0, 0, .15)"
+                  borderless={false}
                 >
                   <Image
                     source={{ uri: photo.uri }}
                     style={styles.thumbnail}
                     resizeMode="cover"
                   />
-                </TouchableOpacity>
+                </TouchableRipple>
               ))}
             </View>
           )}
@@ -151,7 +153,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
             )}
           </View>
         </Card.Content>
-      </TouchableOpacity>
+      </TouchableRipple>
     </Card>
   );
 };
