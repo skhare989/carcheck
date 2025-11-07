@@ -45,10 +45,53 @@ Building a mobile app (React Native + Expo) that helps rental car customers syst
 - ✅ **Section 7:** Inspection Checklist (100% complete - UI & state management)
 - ⏳ **Section 8:** Camera Integration (0% complete - placeholder only)
 
-**Next Immediate Steps:**
-1. Implement Camera functionality (expo-camera integration)
-2. Add photo capture and storage to device
-3. Implement GPS/location tagging for photos
+**Next Immediate Steps (Nov 7, 2025 - Phase 2):**
+
+## NEW: Photo Implementation & Home Screen Plan
+
+### Overview
+Implementing complete photo capture system with local storage and GPS tagging, plus home screen rental list to resume/view existing rentals.
+
+### Phase 1: Home Screen Rental List (Priority 1)
+**Goal:** Users can see and resume existing rentals
+
+**Implementation Plan:**
+1. Create RentalCard component (`src/components/rental/RentalCard.tsx`)
+2. Update HomeScreen to load and display rentals grouped by status
+3. Create RentalDetailScreen for completed rentals (read-only view)
+
+**Details:**
+- Group rentals by status: In Progress, Pending, Completed
+- Smart navigation: in-progress/pending → Checklist, completed → RentalDetail
+- Use FlatList with section headers for performance
+- Show progress (X/6 photos) on each card
+
+### Phase 2: Camera & Photo Storage (Priority 1)
+**Goal:** Users can take and store photos with GPS tags locally on device
+
+**Implementation Plan:**
+1. Configure permissions in app.json (camera, location)
+2. Install packages: expo-camera, expo-location, expo-file-system, expo-image-manipulator
+3. Implement CameraScreen with full functionality
+4. Create photo storage utility (photoStorage.ts)
+5. Uncomment camera navigation in ChecklistScreen
+
+**Photo Storage Strategy:**
+- Location: app's private document directory (FileSystem.documentDirectory + 'photos/')
+- File naming: `rental_{rentalId}_section_{sectionName}_{timestamp}.jpg`
+- Metadata in AsyncStorage (uri, timestamp, GPS coords, section)
+- Compression to ~1-2MB per photo
+- Cleanup on rental deletion
+
+**Permission Flow:**
+- Request on first photo attempt (lazy loading)
+- Show explanation if denied
+- Provide settings link
+
+**Data Flow:**
+- Home → NewRental → Checklist → Camera → Checklist → Home
+- Home → Tap rental (in-progress) → Checklist → Camera → ...
+- Home → Tap rental (completed) → RentalDetail (read-only)
 
 ---
 

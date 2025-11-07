@@ -39,7 +39,7 @@ src/
 ├── utils/             # Utility functions
 ├── types/             # TypeScript type definitions
 ├── constants/         # App constants (CRITICAL - use these for all styling)
-│   ├── spacing.ts      # SPACING.XS, SM, MD, LG, XL
+│   ├── spacing.ts      # spacing.xs, sm, md, lg, xl
 │   ├── typography.ts   # Font sizes, weights, styles
 │   ├── colors.ts       # Color palette
 │   └── index.ts        # Main exports
@@ -60,6 +60,52 @@ src/
 - Screens: PascalCase with "Screen" suffix (e.g., `HomeScreen.tsx`)
 - Utils/hooks: camelCase (e.g., `useCamera.ts`)
 - Constants: UPPER_SNAKE_CASE (e.g., `RENTAL_COMPANIES.ts`)
+- **Styles files:** For components with significant styling, create a separate `.styles.ts` file (e.g., `PhotoChecklist.styles.ts`)
+
+### Styles File Organization
+**IMPORTANT:** For components with more than a few style definitions, create a separate styles file to keep code organized and maintainable.
+
+**Pattern:**
+- Component file: `ComponentName.tsx`
+- Styles file: `ComponentName.styles.ts`
+- Index file: `index.ts` (exports the component)
+
+**Example structure:**
+```
+src/components/rental/
+├── RentalCard.tsx
+├── RentalCard.styles.ts  # Separate styles file
+└── index.ts
+```
+
+**When to use separate styles files:**
+- ✅ Components with 5+ style definitions
+- ✅ Complex styling logic
+- ✅ Reusable components used across screens
+- ❌ Simple components with 1-3 styles can keep styles inline
+
+**Example styles file (`ComponentName.styles.ts`):**
+```tsx
+import { StyleSheet } from 'react-native';
+import { spacing, colors } from '../../constants';
+
+export const componentStyles = StyleSheet.create({
+  container: {
+    padding: spacing.md,
+    backgroundColor: colors.surface,
+  },
+  title: {
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+  },
+  // ... more styles
+});
+```
+
+**Import in component:**
+```tsx
+import { componentStyles as styles } from './ComponentName.styles';
+```
 
 ### Component Structure
 ```tsx

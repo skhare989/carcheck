@@ -273,57 +273,169 @@ carcheck-app/
 
 ---
 
-## 🎯 Next Steps (Prioritized)
+## 🎯 Next Steps (Prioritized) - UPDATED Nov 7, 2025
 
-### Immediate (This Week)
-1. **Implement Camera Screen**
-   - Install expo-camera
-   - Build camera functionality
-   - Photo capture and save
-   - Update rental with photo
+### NEW IMPLEMENTATION PLAN: Photo System & Home Screen
 
-2. **Photo Storage & Management**
-   - Install expo-file-system
-   - Save photos to device
-   - Display photos in checklist
-   - Photo deletion support
+## Phase 1: Home Screen Rental List (Priority 1)
+**Goal:** Users can see and resume existing rentals
 
-3. **Test Complete Flow**
-   - Create rental → Take photos → Complete checklist
-   - Verify data persistence
-   - Test on physical device
+### 1. Create RentalCard Component
+**File:** `src/components/rental/RentalCard.tsx`
+**Features:**
+- Display company name + logo
+- Show license plate
+- Status badge (color-coded: in-progress=blue, pending=gray, completed=green)
+- Progress indicator (X/6 sections complete)
+- Date created
+- Touchable with ripple effect
+- Smart navigation based on status
 
-### Short Term (Next Week)
-4. **GPS/Location Integration**
-   - Install expo-location
-   - Tag photos with coordinates
-   - Display in UI
+### 2. Update HomeScreen
+**File:** `src/screens/HomeScreen.tsx`
+**Features:**
+- Load rentals from storage on mount with useFocusEffect
+- Group rentals by status into sections:
+  - 🔵 In Progress (X/6 photos)
+  - ⏱️ Pending (saved for later)
+  - ✅ Completed (all done)
+- FlatList with SectionList headers for performance
+- Empty state only when truly no rentals
+- Pull-to-refresh functionality
+- Smart navigation logic:
+  - Tap in-progress/pending → ChecklistScreen
+  - Tap completed → RentalDetailScreen
 
-5. **Home Screen Rental List**
-   - Load and display all rentals
-   - Status indicators
-   - Quick actions
-   - Navigation to details
+### 3. Create RentalDetailScreen
+**File:** `src/screens/RentalDetailScreen.tsx`
+**Features:**
+- Read-only view for completed rentals
+- Display full rental information
+- Photo gallery organized by 6 sections
+- Show metadata (timestamp, GPS) for each photo
+- Export button (placeholder for Phase 3)
+- Delete rental option
 
-6. **Rental Detail Screen**
-   - Full rental view
-   - Photo gallery
-   - Metadata display
+---
 
-### Medium Term (Following Week)
-7. **PDF Export**
-   - Install expo-print
-   - Generate PDF reports
-   - Include photos and metadata
+## Phase 2: Camera & Photo Storage (Priority 1)
+**Goal:** Users can take and store photos with GPS tags locally on device
 
-8. **Email/Sharing**
-   - Install expo-sharing
-   - Share PDF functionality
+### 4. Configure Permissions
+**File:** `app.json`
+**Add:**
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow CarCheck to take photos of your rental vehicle for documentation"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow CarCheck to tag photos with GPS coordinates for evidence"
+        }
+      ]
+    ]
+  }
+}
+```
 
-9. **Polish & Testing**
-   - Error handling
-   - Loading states
-   - Real-world testing
+### 5. Install Required Packages
+```bash
+npx expo install expo-camera
+npx expo install expo-location
+npx expo install expo-file-system
+npx expo install expo-image-manipulator
+```
+
+### 6. Implement CameraScreen
+**File:** `src/screens/CameraScreen.tsx`
+**Features:**
+- Request permissions on mount (camera + location)
+- Full-screen camera preview with CameraView
+- Overlay guides for each section type (optional for v1)
+- Large capture button (FAB style)
+- Get GPS coordinates on capture
+- Compress photo using expo-image-manipulator
+- Save to file system with unique filename
+- Update rental in AsyncStorage with photo metadata
+- Navigate back to ChecklistScreen
+- Handle errors (no permission, camera unavailable)
+
+**Technical Details:**
+- File naming: `rental_{rentalId}_section_{sectionName}_{timestamp}.jpg`
+- Storage location: `FileSystem.documentDirectory + 'photos/'`
+- Compression: ~1-2MB per photo (manipulate with compress option)
+- Photo metadata object:
+  ```typescript
+  {
+    id: string,
+    uri: string, // file:///path/to/photo.jpg
+    section: string,
+    timestamp: Date,
+    location: { latitude: number, longitude: number }
+  }
+  ```
+
+### 7. Create Photo Storage Utility
+**File:** `src/utils/photoStorage.ts`
+**Functions:**
+- `initPhotoDirectory()` - Create photos directory if doesn't exist
+- `savePhoto(rentalId, sectionId, photoUri, location)` - Save photo to file system
+- `getPhotoUri(rentalId, sectionId)` - Get photo file path
+- `deletePhoto(photoUri)` - Delete single photo file
+- `deleteRentalPhotos(rentalId)` - Cleanup all photos for a rental
+- `compressPhoto(uri)` - Compress image before saving
+
+### 8. Enable Camera Navigation
+**File:** `src/screens/ChecklistScreen.tsx:90`
+- Uncomment navigation to CameraScreen
+- Remove Alert placeholder
+
+---
+
+## Phase 3: Photo Management & Export (Post-MVP)
+
+### 9. Photo Gallery & Viewer
+- View/delete individual photos within sections
+- Full-screen photo viewer with swipe
+- Photo preview before saving
+- Retake functionality
+
+### 10. PDF Export
+- Install expo-print
+- Generate PDF with all photos + metadata
+- Professional template design
+
+### 11. Email/Sharing
+- Install expo-sharing
+- Share PDF via email
+- Pre-populate subject/body
+
+---
+
+## Immediate (This Week)
+1. ✅ Design components (RentalCard, HomeScreen updates, RentalDetailScreen)
+2. Implement Phase 1: Home Screen Rental List
+3. Implement Phase 2: Camera & Photo Storage
+4. Test complete flow on physical device
+
+## Short Term (Next Week)
+5. Add photo gallery viewer
+6. Implement PDF export
+7. Add email/sharing functionality
+8. Polish error handling and loading states
+
+## Medium Term (Following Weeks)
+9. Real-world testing with actual rentals
+10. Performance optimization
+11. Onboarding experience
+12. App store preparation
 
 ---
 
