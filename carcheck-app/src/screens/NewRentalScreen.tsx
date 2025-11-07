@@ -60,11 +60,9 @@ export const NewRentalScreen: React.FC<NewRentalScreenProps> = ({ navigation }) 
       newErrors.licensePlate = 'License plate must be 3-10 characters';
     }
 
-    // Validate date (required and must not be in future)
+    // Validate date (only check if provided)
     if (!rentalStartDate) {
       newErrors.rentalStartDate = 'Rental start date is required';
-    } else if (rentalStartDate > new Date()) {
-      newErrors.rentalStartDate = 'Rental start date cannot be in the future';
     }
 
     setErrors(newErrors);
@@ -244,9 +242,6 @@ export const NewRentalScreen: React.FC<NewRentalScreenProps> = ({ navigation }) 
           onDismiss={handleDateDismiss}
           date={rentalStartDate}
           onConfirm={handleDateConfirm}
-          validRange={{
-            endDate: new Date(),
-          }}
         />
 
         {/* Car Make/Model */}

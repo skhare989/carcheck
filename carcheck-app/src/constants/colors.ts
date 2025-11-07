@@ -16,9 +16,13 @@ export const colors = {
 
   // Semantic colors
   success: '#4CAF50',
+  successLight: '#E8F5E9',
   warning: '#FF9800',
+  warningLight: '#FFF3E0',
   error: '#F44336',
+  errorLight: '#FFEBEE',
   info: '#2196F3',
+  infoLight: '#E3F2FD',
 
   // Neutral colors
   white: '#FFFFFF',
