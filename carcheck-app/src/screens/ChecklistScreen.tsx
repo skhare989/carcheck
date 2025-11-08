@@ -77,17 +77,7 @@ export const ChecklistScreen: React.FC<ChecklistScreenProps> = ({ navigation, ro
 
   // Navigate to camera screen
   const handleTakePhoto = (sectionId: string) => {
-    // TODO: Navigate to CameraScreen when implemented
-    Alert.alert(
-      'Camera Coming Soon',
-      `Camera functionality will be implemented next. You tapped section: ${sectionId}`,
-      [
-        {
-          text: 'OK',
-        },
-      ]
-    );
-    // navigation.navigate('Camera', { rentalId, sectionId });
+    navigation.navigate('Camera', { rentalId, sectionId });
   };
 
   // View photos for a section

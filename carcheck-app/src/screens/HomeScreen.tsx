@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { HomeScreenProps } from '../types/navigation';
 import { Rental } from '../types/rental';
 import { getRentals, deleteRental } from '../utils/storage';
+import { deleteRentalPhotos } from '../utils/photoStorage';
 import { RentalCard } from '../components/rental';
 import { colors } from '../constants';
 import { homeScreenStyles as styles } from './HomeScreen.styles';
@@ -102,8 +103,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     if (!rentalToDelete) return;
 
     try {
+      // Delete photos from file system
+      await deleteRentalPhotos(rentalToDelete.id);
+
+      // Delete rental metadata
       await deleteRental(rentalToDelete.id);
-      // TODO: Also delete photos from file system when photo storage is implemented
+
       await loadRentals();
       setDeleteDialogVisible(false);
       setRentalToDelete(null);

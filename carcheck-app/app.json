@@ -12,7 +12,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "CarCheck needs camera access to take photos of your rental vehicle for documentation and protection against false damage charges.",
+        "NSLocationWhenInUseUsageDescription": "CarCheck uses your location to tag photos with GPS coordinates for evidence in case of disputes."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +24,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
