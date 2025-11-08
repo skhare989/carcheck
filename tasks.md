@@ -9,7 +9,7 @@ Building a mobile app (React Native + Expo) that helps rental car customers syst
 
 ---
 
-## Current Status (Nov 7, 2025) - Latest Update
+## Current Status (Nov 8, 2025) - Latest Update
 
 **Environment Setup: ✅ COMPLETE**
 - Expo project created and verified
@@ -25,73 +25,150 @@ Building a mobile app (React Native + Expo) that helps rental car customers syst
 - Data models and storage layer implemented (AsyncStorage)
 - All core constants and configurations in place
 
-**Recently Completed (Latest Session):**
-- ✅ NewRentalScreen fully functional with form validation
-- ✅ Fixed date picker bugs (current date & future dates now allowed)
-- ✅ Checklist section constants defined (6 sections)
-- ✅ ProgressHeader component built
-- ✅ SectionCard component built with expand/collapse
-- ✅ ChecklistScreen fully implemented with state management
-- ✅ CameraScreen placeholder created and wired up
-- ✅ Navigation updated with Camera route
+**Recently Completed (Nov 8, 2025):**
+- ✅ HomeScreen rebuilt with rental list, grouping, delete functionality
+- ✅ RentalCard component with smart navigation and context menus
+- ✅ Full CameraScreen implementation with GPS tagging
+- ✅ Photo storage system with per-rental folders
+- ✅ Design decisions documented
+- ✅ Camera performance architecture documented
 
 **Progress Summary:**
 - ✅ **Section 1:** Project Setup & Configuration (100% complete)
 - ✅ **Section 2:** Design System & Theme Setup (100% complete)
 - ✅ **Section 3:** Navigation Structure (100% complete)
 - ✅ **Section 4:** Data Models & Storage (100% complete)
-- ⏳ **Section 5:** Home Screen (50% complete - needs rental list display)
+- ✅ **Section 5:** Home Screen (100% complete - with rental list display)
 - ✅ **Section 6:** New Rental Form (100% complete)
 - ✅ **Section 7:** Inspection Checklist (100% complete - UI & state management)
-- ⏳ **Section 8:** Camera Integration (0% complete - placeholder only)
+- ✅ **Section 8:** Camera Integration (100% complete - performance optimization pending)
+- ⏳ **Section 9:** Camera Performance Optimization (0% complete - architecture ready)
 
-**Next Immediate Steps (Nov 7, 2025 - Phase 2):**
+**Next Immediate Steps (Nov 8, 2025):**
 
-## NEW: Photo Implementation & Home Screen Plan
+## ✅ COMPLETED: Photo Implementation & Home Screen
+
+### Home Screen Rental List ✅
+**Status:** COMPLETE
+
+**Implemented:**
+- ✅ RentalCard component with separate styles file
+- ✅ HomeScreen with SectionList grouping by status
+- ✅ Smart navigation (completed → RentalDetail, others → Checklist)
+- ✅ Delete confirmation with photo warnings
+- ✅ Pull-to-refresh functionality
+- ✅ Progress display (X/6 photos)
+- ✅ 3-dot context menus with status-specific options
+- ✅ Fixed menu interaction issues with event propagation
+
+### Camera & Photo Storage ✅
+**Status:** COMPLETE (Performance Optimization Pending)
+
+**Implemented:**
+- ✅ Permissions configured in app.json (camera, location)
+- ✅ Installed: expo-camera, expo-location, expo-file-system
+- ✅ Full CameraScreen with permissions flow
+- ✅ Photo storage utility with new expo-file-system API
+- ✅ Per-rental folder structure: `photos/rental_{id}/{sectionId}_{timestamp}.jpg`
+- ✅ GPS tagging with Accuracy.Balanced
+- ✅ Camera navigation enabled in ChecklistScreen
+- ✅ Flash control (AUTO/ON/OFF)
+- ✅ Guidance overlay with section details
+- ✅ Auto photo directory initialization
+
+**Performance Issue Discovered:**
+- ⚠️ Photo capture takes 5-10 seconds before returning to checklist
+- Primary bottleneck: GPS acquisition (2-10 seconds)
+- See: `photo-upload-architecture.md` for detailed analysis
+
+## 🚀 NEW: Camera Performance Optimization (Priority 1)
 
 ### Overview
-Implementing complete photo capture system with local storage and GPS tagging, plus home screen rental list to resume/view existing rentals.
+Optimize photo capture flow to improve perceived performance from 5-10 seconds to under 1 second.
 
-### Phase 1: Home Screen Rental List (Priority 1)
-**Goal:** Users can see and resume existing rentals
+**Current Problem:**
+- User sees camera screen frozen for 5-10 seconds after capture
+- GPS location fetch is primary bottleneck (2-10s)
+- Poor user experience during background processing
 
-**Implementation Plan:**
-1. Create RentalCard component (`src/components/rental/RentalCard.tsx`)
-2. Update HomeScreen to load and display rentals grouped by status
-3. Create RentalDetailScreen for completed rentals (read-only view)
+**Proposed Solutions:**
 
-**Details:**
-- Group rentals by status: In Progress, Pending, Completed
-- Smart navigation: in-progress/pending → Checklist, completed → RentalDetail
-- Use FlatList with section headers for performance
-- Show progress (X/6 photos) on each card
+### Option 1: Simple GPS Optimization (Quick Win)
+**Goal:** Reduce capture time to 1-2 seconds
+**Implementation Time:** 1-2 hours
 
-### Phase 2: Camera & Photo Storage (Priority 1)
-**Goal:** Users can take and store photos with GPS tags locally on device
+**Changes:**
+1. Use `Location.getLastKnownPositionAsync()` (instant, cached location)
+2. Fallback to low accuracy if no cache available
+3. Optional: Pre-warm GPS on camera mount
 
-**Implementation Plan:**
-1. Configure permissions in app.json (camera, location)
-2. Install packages: expo-camera, expo-location, expo-file-system, expo-image-manipulator
-3. Implement CameraScreen with full functionality
-4. Create photo storage utility (photoStorage.ts)
-5. Uncomment camera navigation in ChecklistScreen
+**Files to Modify:**
+- `src/screens/CameraScreen.tsx` - Update GPS strategy in handleCapture
 
-**Photo Storage Strategy:**
-- Location: app's private document directory (FileSystem.documentDirectory + 'photos/')
-- File naming: `rental_{rentalId}_section_{sectionName}_{timestamp}.jpg`
-- Metadata in AsyncStorage (uri, timestamp, GPS coords, section)
-- Compression to ~1-2MB per photo
-- Cleanup on rental deletion
+**Pros:**
+- Simple, low-risk implementation
+- 1-2 second capture time may be "good enough"
+- Can always upgrade to Option 2 later
 
-**Permission Flow:**
-- Request on first photo attempt (lazy loading)
-- Show explanation if denied
-- Provide settings link
+**Cons:**
+- Still some delay (1-2 seconds)
+- GPS accuracy may be slightly lower with cached location
 
-**Data Flow:**
-- Home → NewRental → Checklist → Camera → Checklist → Home
-- Home → Tap rental (in-progress) → Checklist → Camera → ...
-- Home → Tap rental (completed) → RentalDetail (read-only)
+### Option 2: Optimistic UI with Progress Overlay (Full Solution)
+**Goal:** Instant feedback with background processing
+**Implementation Time:** 4-6 hours
+
+**Implementation:**
+1. Navigate back immediately after photo capture (~0.6s)
+2. Show temporary photo in checklist with loading overlay
+3. Background processing (GPS + save) continues
+4. Auto-remove overlay when complete (~4s total)
+
+**User Experience:**
+- t=0.6s: User sees checklist with photo ✅ Perceived as instant
+- t=4s: Loading overlay disappears silently
+
+**Files to Modify:**
+- `src/screens/CameraScreen.tsx` - Immediate navigation with temp data
+- `src/screens/ChecklistScreen.tsx` - Temp photo state + polling
+- `src/components/checklist/SectionCard.tsx` - Loading overlay on thumbnails
+- `src/types/rental.ts` - Add TempPhotoData interface
+- `src/types/navigation.ts` - Update ChecklistScreenParams
+
+**Data Structures:**
+```typescript
+interface TempPhotoData {
+  sectionId: string;
+  tempUri: string;
+  timestamp: number;
+}
+
+interface ChecklistScreenParams {
+  rentalId: string;
+  tempPhotoData?: TempPhotoData;
+}
+```
+
+**Key Components:**
+- Polling mechanism (1s interval while temp photos exist)
+- Photo matching logic (timestamp window)
+- Loading overlay with ActivityIndicator
+- Graceful timeout handling (30s)
+
+**Pros:**
+- Feels 10x faster to user
+- Professional UX pattern
+- Clear progress indication
+
+**Cons:**
+- More complex implementation
+- Additional state management
+- Need to handle edge cases (app close, navigation away)
+
+### Decision Point
+**Recommendation:** Start with Option 1, upgrade to Option 2 if needed
+
+See `photo-upload-architecture.md` for complete technical details, data flow diagrams, and implementation considerations
 
 ---
 
@@ -146,20 +223,28 @@ Implementing complete photo capture system with local storage and GPS tagging, p
   - ChecklistSection (name, status, photos) ✅
 - [x] Set up local storage with AsyncStorage ✅
 - [x] Create data access layer (CRUD operations) ✅
-- [ ] Implement photo file naming convention
-- [ ] Set up metadata storage (timestamps, GPS, labels)
+- [x] Implement photo file naming convention: `{sectionId}_{timestamp}.jpg` ✅
+- [x] Set up metadata storage (timestamps, GPS, labels) in Photo model ✅
+- [x] Implement photo storage utility (photoStorage.ts) ✅
+- [x] Per-rental folder structure: `photos/rental_{id}/` ✅
+- [x] Photo deletion on rental deletion ✅
 
 ### 5. Core Screen: Home Screen
 - [x] Create HomeScreen component ✅
 - [x] Build "Start New Rental" button using Paper's FAB (Floating Action Button) ✅
-- [ ] Create rental list view (current + past) using FlatList or ScrollView
-- [ ] Build RentalCard component using Paper's Card component:
-  - Card.Title for company and date
-  - Card.Content for car details and photo count
-  - Use Card's onPress for navigation
-- [ ] Implement filtering/sorting by date
+- [x] Create rental list view using SectionList grouped by status ✅
+- [x] Build RentalCard component with separate styles file ✅
+  - Card.Title for company and date ✅
+  - Card.Content for car details and photo count ✅
+  - Smart navigation based on status ✅
+  - 3-dot context menu with status-specific options ✅
+- [x] Implement grouping by status (In Progress, Pending, Completed) ✅
 - [x] Add tap navigation to rental details ✅
 - [x] Handle empty state with Paper's Surface and Text components ✅
+- [x] Implement delete with confirmation and photo warnings ✅
+- [x] Add pull-to-refresh functionality ✅
+- [x] Fixed menu interaction issues (event propagation) ✅
+- [x] Fixed status chip vertical alignment ✅
 
 ### 6. Core Screen: New Rental Form
 - [x] Create NewRentalScreen component ✅
@@ -207,32 +292,41 @@ Implementing complete photo capture system with local storage and GPS tagging, p
 ### 8. Core Screen: Camera with Guides
 - [x] Create CameraScreen placeholder ✅
 - [x] Wire up navigation from checklist to camera ✅
-- [ ] Integrate expo-camera
-- [ ] Request camera permissions
-- [ ] Build full-screen camera viewfinder
-- [ ] Add semi-transparent car outline overlay
-- [ ] Display text prompts per section using Paper's Banner or custom Text overlay:
-  - "Capture front bumper, hood, and windshield"
-  - "Capture driver side door, wheel, and mirror"
-  - etc.
-- [ ] Large shutter button using Paper's FAB or custom IconButton
-- [ ] Quick capture with immediate confirmation using Paper's Snackbar
-- [ ] Handle photo saving with proper metadata
-- [ ] Cancel/back functionality using Paper's IconButton
-- [ ] Support multiple photos per section with Paper's Chip to show count
+- [x] Integrate expo-camera with CameraView component ✅
+- [x] Request camera permissions with graceful handling ✅
+- [x] Request location permissions for GPS tagging ✅
+- [x] Build full-screen camera viewfinder ✅
+- [x] Display guidance overlay with section title and description ✅
+- [x] Large shutter button with loading state ✅
+- [x] Flash control (AUTO/ON/OFF) with icon button ✅
+- [x] GPS location tagging with Accuracy.Balanced ✅
+- [x] Handle photo saving with proper metadata (timestamp, GPS, section) ✅
+- [x] Cancel/back functionality using Paper's IconButton ✅
+- [x] Photo quality set to 0.7 for size optimization ✅
+- [x] Permission denied states with settings link ✅
+- [x] Auto status update (pending → in_progress) on first photo ✅
+- [x] Navigate back to checklist after capture ✅
+- [ ] ⚠️ Performance optimization needed (5-10s capture time)
+  - See `photo-upload-architecture.md` for solutions
+  - Option 1: GPS caching (1-2 hours)
+  - Option 2: Optimistic UI (4-6 hours)
 
 ### 9. Photo Management & Metadata
-- [ ] Implement photo capture and storage
-- [ ] Generate meaningful filenames (date_rentalID_section_timestamp)
-- [ ] Auto-tag photos with:
-  - Timestamp (date and exact time)
-  - GPS coordinates (latitude/longitude) via expo-location
-  - Location name (if available)
-  - Car section label
-  - Rental identification
-- [ ] Handle photo compression for storage optimization
-- [ ] Create photo thumbnail generation
-- [ ] Implement photo gallery view by section
+- [x] Implement photo capture and storage ✅
+- [x] Generate meaningful filenames: `{sectionId}_{timestamp}.jpg` ✅
+- [x] Per-rental folder structure: `photos/rental_{id}/` ✅
+- [x] Auto-tag photos with: ✅
+  - Timestamp (date and exact time) ✅
+  - GPS coordinates (latitude/longitude) via expo-location ✅
+  - Car section label ✅
+  - Rental identification ✅
+- [x] Handle photo compression (quality: 0.7) ✅
+- [x] Photo storage utility with new expo-file-system API ✅
+- [x] Photo deletion on rental deletion ✅
+- [x] Basic photo gallery view by section in SectionCard ✅
+- [ ] Location name reverse geocoding (optional enhancement)
+- [ ] Photo thumbnail generation (optional enhancement)
+- [ ] Full-screen photo viewer with swipe (pending)
 
 ### 10. Core Screen: Rental Detail / Gallery
 - [ ] Create RentalDetailScreen component
@@ -493,9 +587,73 @@ The MVP will be considered complete when:
 **Time Investment:** ~3 hours
 **Status:** Core checklist UI complete, ready for camera integration
 
+### Session 4 - Nov 8, 2025
+**Accomplishments:**
+- ✅ **Rebuilt HomeScreen with full rental list functionality:**
+  - SectionList with grouping by status (In Progress, Pending, Completed)
+  - Pull-to-refresh
+  - Delete confirmation with photo warnings
+  - Smart navigation based on rental status
+  - Empty states
+- ✅ **Created RentalCard component:**
+  - Separate styles file following new pattern
+  - 3-dot context menu with status-specific options
+  - Fixed menu interaction issues with event propagation
+  - Fixed status chip vertical alignment
+  - Progress display (X/6 photos)
+  - Company logo placeholder and make/model display
+- ✅ **Complete CameraScreen implementation:**
+  - Full camera integration with expo-camera
+  - Permission handling (camera + location)
+  - Flash control (AUTO/ON/OFF)
+  - Guidance overlay with section details
+  - GPS location tagging
+  - Photo capture with quality 0.7
+  - Loading states and error handling
+  - Permission denied states with settings links
+  - Auto status update on first photo
+- ✅ **Photo storage system:**
+  - Implemented photoStorage.ts with new expo-file-system API
+  - Per-rental folder structure: `photos/rental_{id}/`
+  - File naming: `{sectionId}_{timestamp}.jpg`
+  - Photo metadata with GPS coordinates
+  - Deletion on rental deletion
+  - Auto initialization on app start
+- ✅ **Updated app.json:**
+  - Added camera and location permissions
+  - iOS Info.plist descriptions
+  - Android permissions
+- ✅ **Documentation:**
+  - Updated CLAUDE.md with styles file organization guidelines
+  - Created design-decisions.md
+  - Created photo-upload-architecture.md (performance analysis)
+  - Updated progress.md to 85% complete
+  - Updated tasks.md with completed work
+
+**Components Created:**
+- `components/rental/RentalCard.tsx`
+- `components/rental/RentalCard.styles.ts`
+- `utils/photoStorage.ts`
+- Complete `screens/CameraScreen.tsx`
+
+**Files Modified:**
+- `screens/HomeScreen.tsx` (complete rebuild)
+- `screens/ChecklistScreen.tsx` (enabled camera navigation)
+- `App.tsx` (photo directory initialization)
+- `app.json` (permissions)
+
+**Performance Issue Discovered:**
+- Camera capture takes 5-10 seconds
+- GPS acquisition is primary bottleneck (2-10s)
+- Documented architecture for two optimization approaches
+- Ready for implementation decision
+
+**Time Investment:** ~6 hours
+**Status:** Home screen, camera, and photo storage complete. Performance optimization pending.
+
 ---
 
-**Last Updated:** November 7, 2025
+**Last Updated:** November 8, 2025
 **UI Library:** React Native Paper (Material Design 3 components)
-**Total Development Time:** ~6.5 hours
-**Current MVP Completion:** ~60% (core screens done, camera + photos remaining)
+**Total Development Time:** ~12.5 hours
+**Current MVP Completion:** ~85% (home + camera + photos done, export + optimization remaining)

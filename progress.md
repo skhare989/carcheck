@@ -1,22 +1,24 @@
 # CarCheck MVP - Progress Report
 
-**Last Updated:** November 7, 2025
-**Project Status:** 60% Complete
-**Next Milestone:** Camera Integration & Photo Management
+**Last Updated:** November 8, 2025
+**Project Status:** 85% Complete
+**Next Milestone:** Camera Performance Optimization & PDF Export
 
 ---
 
 ## 📊 Overall Progress
 
 ```
-[████████████████████░░░░░░░░] 60%
+[█████████████████████████░░░] 85%
 
 ✅ Foundation & Setup        100%
 ✅ New Rental Form           100%
 ✅ Checklist Screen          100%
-⏳ Camera Integration          0%
-⏳ Photo Management            0%
-⏳ Home Screen List           50%
+✅ Camera Integration        100% (Performance optimization pending)
+✅ Photo Management          100%
+✅ Home Screen List          100%
+⏳ Camera Optimization         0% (See photo-upload-architecture.md)
+⏳ Rental Detail Screen        0%
 ⏳ PDF Export                  0%
 ⏳ Email/Sharing               0%
 ```
@@ -165,76 +167,130 @@ carcheck-app/
 
 ---
 
-## ⏳ In Progress / Partial
+### 5. Home Screen with Rental List (100%)
+**Status:** Production Ready
 
-### Home Screen (50%)
-**Status:** Needs Rental List Implementation
+**Features:**
+- ✅ Load and display all rentals from storage
+- ✅ Group rentals by status (In Progress, Pending, Completed)
+- ✅ Section headers with counts (e.g., "IN PROGRESS (2)")
+- ✅ Collapsible completed section (default: collapsed)
+- ✅ RentalCard component with:
+  - Company logo and name
+  - License plate
+  - Color-coded status badges
+  - Photo progress (X/6 sections)
+  - Make/model display
+  - Creation date
+  - 3-dot context menu
+- ✅ Smart navigation (in-progress → Checklist, completed → RentalDetail)
+- ✅ Delete confirmation with photo warning
+- ✅ Pull-to-refresh functionality
+- ✅ Empty state when no rentals
+- ✅ useFocusEffect auto-reload
 
-**Completed:**
-- ✅ Basic screen structure
-- ✅ FAB button for "Start New Rental"
-- ✅ Empty state UI
-- ✅ Navigation to NewRental screen
-
-**Missing:**
-- ❌ Display list of saved rentals
-- ❌ Rental cards showing company, date, status, photo count
-- ❌ Quick actions (resume, view details, delete)
-- ❌ Filter/sort functionality
-- ❌ Pull-to-refresh
-- ❌ Swipe actions
+**Components:**
+- `src/components/rental/RentalCard.tsx`
+- `src/components/rental/RentalCard.styles.ts`
+- `src/screens/HomeScreen.tsx`
+- `src/screens/HomeScreen.styles.ts`
 
 **File:** `src/screens/HomeScreen.tsx`
+
+### 6. Camera Integration (100%)
+**Status:** Functional - Performance Optimization Pending
+
+**Features:**
+- ✅ Full-screen camera preview with expo-camera
+- ✅ Permission handling (camera + location)
+- ✅ Permission denied screen with "Open Settings"
+- ✅ Flash control (AUTO → OFF → ON, default: AUTO)
+- ✅ Section-specific guidance overlay
+- ✅ Close button (back without saving)
+- ✅ Large capture button
+- ✅ Maximum quality photo capture (quality: 0.7)
+- ✅ GPS location tagging (when permission granted)
+- ✅ Immediate save to file system
+- ✅ Rental metadata update
+- ✅ Auto-update status (pending → in_progress)
+- ✅ Navigation back to checklist
+- ✅ ChecklistScreen auto-reload
+
+**Known Issue:**
+- ⚠️ Photo capture takes 5-10 seconds before returning to checklist
+- **Cause:** GPS acquisition (2-10s) + file operations
+- **Solution:** See `photo-upload-architecture.md` for optimization plan
+
+**Components:**
+- `src/screens/CameraScreen.tsx`
+- `src/screens/CameraScreen.styles.ts`
+
+**Permissions Configured:**
+- iOS: NSCameraUsageDescription, NSLocationWhenInUseUsageDescription
+- Android: CAMERA, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
+
+**File:** `src/screens/CameraScreen.tsx`
+
+### 7. Photo Storage Utility (100%)
+**Status:** Production Ready
+
+**Features:**
+- ✅ Per-rental folder organization
+- ✅ Automatic directory creation
+- ✅ File naming: `{sectionId}_{timestamp}.jpg`
+- ✅ Photo metadata with GPS coordinates
+- ✅ Maximum quality (no compression)
+- ✅ Graceful error handling
+- ✅ Cleanup on rental deletion
+- ✅ Integration with App.tsx (init on startup)
+- ✅ Integration with HomeScreen (delete photos)
+- ✅ Integration with CameraScreen (save photos)
+
+**Storage Structure:**
+```
+photos/
+├── rental_abc123/
+│   ├── front_exterior_1699234567890.jpg
+│   ├── sides_back_roof_1699234590456.jpg
+│   └── ...
+├── rental_xyz789/
+│   └── ...
+```
+
+**Functions:**
+- `initPhotoDirectory()` - Create base directory
+- `savePhoto()` - Save photo with metadata
+- `deletePhoto()` - Delete single photo
+- `deleteRentalPhotos()` - Delete all photos for rental
+- `getRentalPhotoUris()` - Get all photo URIs (helper)
+
+**File:** `src/utils/photoStorage.ts`
+
+---
+
+## ⏳ In Progress
+
+### Camera Performance Optimization (0%)
+**Status:** Architecture Documented - Not Yet Implemented
+
+**Problem:**
+- Camera photo capture takes 5-10 seconds before returning
+- User sees frozen camera screen during GPS + save operations
+- Poor user experience
+
+**Proposed Solutions:**
+- **Phase 1 (Simple):** Use cached GPS location, low accuracy fallback
+  - Expected time: 1-2 seconds (vs 5-10s)
+  - 1 hour implementation
+- **Phase 2 (Complex):** Optimistic UI with temp photos and background processing
+  - Expected time: 0.6 seconds perceived (background: 3-4s)
+  - 4-6 hours implementation
+
+**Documentation:** See `photo-upload-architecture.md` for complete analysis and architecture
 
 ---
 
 ## ❌ Not Started
-
-### Camera Integration (Priority: HIGH)
-**Status:** Placeholder Only
-
-**Required:**
-- ❌ Install `expo-camera`
-- ❌ Request camera permissions
-- ❌ Build camera preview
-- ❌ Implement photo capture
-- ❌ Save photos to device file system
-- ❌ Generate photo URIs
-- ❌ Update rental with photo data
-- ❌ Handle errors (no permission, no camera)
-
-**Optional Enhancements:**
-- Semi-transparent overlay guides
-- Section-specific instructions
-- Flash control
-- Photo preview before saving
-- Retake functionality
-
-**File:** `src/screens/CameraScreen.tsx` (currently placeholder)
-
-### Photo Management (Priority: HIGH)
-**Status:** Not Started
-
-**Required:**
-- ❌ Install `expo-file-system`
-- ❌ Photo file naming convention
-- ❌ Save photos to app directory
-- ❌ Generate thumbnails for UI
-- ❌ Image compression/optimization
-- ❌ Photo deletion
-- ❌ Associate photos with sections
-- ❌ Photo metadata storage
-
-### GPS/Location Tagging (Priority: MEDIUM)
-**Status:** Not Started
-
-**Required:**
-- ❌ Install `expo-location`
-- ❌ Request location permissions
-- ❌ Capture GPS coordinates on photo
-- ❌ Handle location unavailable
-- ❌ Store location with photo metadata
-- ❌ Display location in rental details
 
 ### Rental Detail Screen (Priority: MEDIUM)
 **Status:** Not Started
@@ -273,14 +329,77 @@ carcheck-app/
 
 ---
 
-## 🎯 Next Steps (Prioritized) - UPDATED Nov 7, 2025
+## 🎯 Next Steps (Prioritized) - UPDATED Nov 8, 2025
 
-### NEW IMPLEMENTATION PLAN: Photo System & Home Screen
+### Immediate Priority (This Week):
 
-## Phase 1: Home Screen Rental List (Priority 1)
+**1. Camera Performance Optimization** ⚠️ CRITICAL
+- See `photo-upload-architecture.md` for detailed plan
+- **Option A:** Simple GPS optimization (1-2 hour implementation)
+  - Use `getLastKnownPositionAsync()` for cached location
+  - Fallback to low accuracy if no cache
+  - Target: 1-2 seconds (vs current 5-10s)
+- **Option B:** Full optimistic UI (4-6 hour implementation)
+  - Immediate navigation with temp photo
+  - Background processing
+  - Loading overlay on thumbnail
+  - Target: 0.6 seconds perceived
+
+**2. Create RentalDetailScreen** ✅ NEXT
+- Read-only view for completed rentals
+- Photo gallery organized by 6 sections
+- Collapsible sections (default: collapsed)
+- Full-screen photo viewer with swipe
+- Metadata display (GPS, timestamp)
+- Export/Share placeholders
+
+### Short Term Priority (Next Week):
+
+**3. Photo Gallery Features**
+- Full-screen photo viewer with pinch-zoom
+- Swipe navigation across all photos
+- Section indicator overlay
+- Delete individual photos
+
+**4. PDF Export**
+- Install expo-print
+- Generate PDF with rental info + all photos
+- Include GPS coordinates and timestamps
+- Professional template design
+
+**5. Email/Sharing**
+- Install expo-sharing
+- Share PDF via email/apps
+- Pre-populate subject/body
+
+### Medium Term (Following Weeks):
+
+**6. Polish & UX Improvements**
+- Error handling refinement
+- Loading states
+- Success feedback
+- Onboarding/tutorial
+
+**7. Real-World Testing**
+- Test with actual rental cars
+- Different lighting conditions
+- Poor GPS signal scenarios
+- Performance on older devices
+
+**8. App Store Preparation**
+- App icons and splash screen
+- Screenshots for store listing
+- Privacy policy
+- Store description
+
+---
+
+## ~~COMPLETED PHASES~~
+
+### ~~Phase 1: Home Screen Rental List~~ ✅ COMPLETE
 **Goal:** Users can see and resume existing rentals
 
-### 1. Create RentalCard Component
+### 1. ~~Create RentalCard Component~~ ✅
 **File:** `src/components/rental/RentalCard.tsx`
 **Features:**
 - Display company name + logo

@@ -129,7 +129,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
               </Button>
             ) : (
               <>
-                {isExpanded && canAddMore && (
+                {canAddMore && (
                   <Button
                     mode="outlined"
                     onPress={handleTakePhoto}
@@ -139,15 +139,18 @@ export const SectionCard: React.FC<SectionCardProps> = ({
                     Add Another Photo
                   </Button>
                 )}
-                {!isExpanded && (
-                  <Button
-                    mode="outlined"
-                    onPress={handleCardPress}
-                    icon={isExpanded ? 'chevron-up' : 'chevron-down'}
-                    style={styles.secondaryButton}
+                {!canAddMore && (
+                  <Text variant="bodySmall" style={styles.photoCount}>
+                    Maximum photos reached ({section.maxPhotos}/{section.maxPhotos})
+                  </Text>
+                )}
+                {!isExpanded && photos.length > 0 && (
+                  <Text
+                    variant="bodySmall"
+                    style={[styles.photoCount, { marginTop: 4 }]}
                   >
-                    Tap to view/add more
-                  </Button>
+                    Tap card to view photos
+                  </Text>
                 )}
               </>
             )}
